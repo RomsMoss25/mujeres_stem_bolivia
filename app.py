@@ -8,7 +8,7 @@ import numpy as np
 import os
 
 # Load the dataset with the cleaned structure
-df_bolivia_30_women = pd.read_csv('/Users/romi_1/Downloads/Mujeres STEM Bolivia  ofi(1).csv')
+df_bolivia_30_women = pd.read_csv('Mujeres STEM Bolivia  ofi(1).csv')
 df_bolivia_30_women.columns = df_bolivia_30_women.columns.str.strip()
 df_bolivia_30_women = df_bolivia_30_women[['Nombre', 'Campo STEM', 'Institución', 'Destacado', 
                                            'Contacto (página personal, otros)', 'Latitud', 'Longitud']]
