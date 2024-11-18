@@ -41,9 +41,14 @@ def ajustar_lat_long(df, zoom):
 # City coordinates for centering the map
 city_coordinates = {
     'La Paz': {"lat": -16.5000, "lon": -68.1500, "zoom": 12},
+    'Cochabamba': {"lat": -17.3895, "lon": -66.1568, "zoom": 12},
     'Santa Cruz': {"lat": -17.7833, "lon": -63.1823, "zoom": 12},
     'Tarija': {"lat": -21.5333, "lon": -64.7333, "zoom": 12},
     'Sucre': {"lat": -19.0333, "lon": -65.2627, "zoom": 12},
+    'Oruro': {"lat": -17.9667, "lon": -67.1064, "zoom": 12},
+    'Potosi': {"lat": -19.5833, "lon": -65.7500, "zoom": 12},
+    'Beni': {"lat": -14.8333, "lon": -64.9000, "zoom": 12},
+    'Pando': {"lat": -11.0264, "lon": -68.7692, "zoom": 12},
     'Todos': {"lat": -17.0, "lon": -65.0, "zoom": 5}
 }
 
