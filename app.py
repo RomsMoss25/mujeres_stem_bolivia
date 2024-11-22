@@ -12,7 +12,6 @@ df_bolivia_30_women = pd.read_csv('Mujeres STEM Bolivia  ofi(1).csv')
 df_bolivia_30_women.columns = df_bolivia_30_women.columns.str.strip()
 df_bolivia_30_women = df_bolivia_30_women[['Nombre', 'Campo STEM', 'Institución', 'Destacado', 
                                            'Contacto (página personal, otros)', 'Latitud', 'Longitud']]
-
 # Clean trailing spaces from Campo STEM values, drop NaN or empty rows
 df_bolivia_30_women['Campo STEM'] = df_bolivia_30_women['Campo STEM'].str.strip()
 df_bolivia_30_women = df_bolivia_30_women.dropna(subset=['Campo STEM'])
@@ -52,9 +51,6 @@ city_coordinates = {
     'Todos': {"lat": -17.0, "lon": -65.0, "zoom": 5}
 }
 
-# File to save user data
-user_data_file = '/mnt/data/user_data.csv'
-
 # Initialize Dash app
 app = dash.Dash(__name__)
 app.title = "Mujeres STEM Bolivia"
@@ -62,7 +58,11 @@ server = app.server
 
 # Layout of the app
 app.layout = html.Div(style={'backgroundColor': '#f7f9fc', 'padding': '20px'}, children=[
-    html.H1("Mujeres STEM en Bolivia", style={'text-align': 'center', 'color': '#333'}),
+    html.H1("¡Bienvenida al Portal Mujeres STEM de Bolivia!", style={'text-align': 'center', 'color': '#333'}),
+    html.P("Este espacio podrás encontrar a mujeres bolivianas que se desenvuelven profesionalmente y lideran en las áreas de ciencia, tecnología, ingeniería y matemáticas (STEM). Encontrarás información clave como su nombre, profesión, ocupación, logros destacados y algún medio de contacto. Nuestro objetivo es visibilizar su impacto y conectar a quienes buscan inspiración, colaboración o referentes en estos campos.", 
+           style={'text-align': 'center', 'color': '#555', 'margin-bottom': '30px'}),
+    
+    html.H1("", style={'text-align': 'center', 'color': '#333'}),
     html.P("Una visualización de mujeres destacadas en el campo STEM en Bolivia", style={'text-align': 'center', 'color': '#555'}),
     
     html.Div([
@@ -85,24 +85,10 @@ app.layout = html.Div(style={'backgroundColor': '#f7f9fc', 'padding': '20px'}, c
     
     dcc.Graph(id='mapa_interactivo', style={'height': '700px'}),
 
-    # Formulario para ingresar datos de contacto
-    html.Div([
-        html.H3("Deja tus datos de contacto", style={'text-align': 'center', 'color': '#333'}),
-        html.Div([
-            dcc.Input(id='nombre', type='text', placeholder='Nombre', style={'margin': '5px', 'width': '40%'}),
-            dcc.Input(id='campo_stem', type='text', placeholder='Campo STEM', style={'margin': '5px', 'width': '40%'}),
-        ], style={'text-align': 'center'}),
-        html.Div([
-            dcc.Input(id='institucion', type='text', placeholder='Institución', style={'margin': '5px', 'width': '40%'}),
-            dcc.Input(id='destacado', type='text', placeholder='Algo destacado', style={'margin': '5px', 'width': '40%'}),
-        ], style={'text-align': 'center'}),
-        html.Div([
-            dcc.Input(id='contacto', type='text', placeholder='Página de contacto', style={'margin': '5px', 'width': '40%'}),
-            dcc.Input(id='departamento', type='text', placeholder='Departamento', style={'margin': '5px', 'width': '40%'}),
-        ], style={'text-align': 'center'}),
-        html.Button('Enviar', id='submit_button', n_clicks=0, style={'display': 'block', 'margin': '10px auto'}),
-        html.Div(id='feedback_message', style={'text-align': 'center', 'color': 'green', 'margin-top': '10px'})
-    ]),
+    html.P("¿Eres y/o conoces a una mujer boliviana trabajando en áreas STEM? Te invitamos a completar este breve formulario para ser incluida en nuestro portal si así lo deseas. Construiremos una red que inspire a más mujeres y fortalezca la presencia femenina en STEM.", 
+           style={'text-align': 'center', 'margin-top': '30px'}),
+    html.A("Completa el formulario aquí", href="https://docs.google.com/forms/d/e/1FAIpQLSfwBN3aT7V-P-qWVlNRC5VXuay5sBZTE2tCq7OUhFO7rnzXKw/viewform?usp=sf_link", target="_blank", style={'text-align': 'center', 'display': 'block', 'margin-top': '10px'}),
+    html.P("¡Deja tu huella y únete al Portal Mujeres STEM Bolivia!", style={'text-align': 'center', 'margin-top': '10px', 'color': '#555'}),
 
     # Nota informativa sobre la versión beta
     html.Div(
@@ -125,36 +111,7 @@ app.layout = html.Div(style={'backgroundColor': '#f7f9fc', 'padding': '20px'}, c
     )
 ])
 
-# Callback para guardar los datos del formulario en un archivo CSV
-@app.callback(
-    Output('feedback_message', 'children'),
-    [Input('submit_button', 'n_clicks')],
-    [State('nombre', 'value'), State('campo_stem', 'value'),
-     State('institucion', 'value'), State('destacado', 'value'),
-     State('contacto', 'value'), State('departamento', 'value')]
-)
-def save_user_data(n_clicks, nombre, campo_stem, institucion, destacado, contacto, departamento):
-    if n_clicks > 0:
-        new_data = {
-            'Nombre': [nombre],
-            'Campo STEM': [campo_stem],
-            'Institución': [institucion],
-            'Destacado': [destacado],
-            'Contacto': [contacto],
-            'Departamento': [departamento]
-        }
-        new_df = pd.DataFrame(new_data)
-        
-        if os.path.exists(user_data_file):
-            new_df.to_csv(user_data_file, mode='a', header=False, index=False)
-        else:
-            new_df.to_csv(user_data_file, index=False)
-        
-        return "¡Datos enviados correctamente!"
-
-    return ""
-
-# Callback to update the map without the table
+# Callback to update the map with filters
 @app.callback(
     Output('mapa_interactivo', 'figure'),
     [Input('filtro_stem', 'value'),
@@ -178,7 +135,7 @@ def update_map(filtro_stem, filtro_ciudad):
             color=dff['Color'],
             opacity=0.85
         ),
-                text=dff['Nombre'],
+        text=dff['Nombre'],
         hoverinfo='text',
         hovertext=dff.apply(lambda row: f"<b>{row['Nombre']}</b><br>{row['Campo STEM']}<br><i>Institución:</i> {row['Institución']}<br><i>Logros:</i> {row['Destacado']}", axis=1),
         customdata=dff['Contacto (página personal, otros)']
