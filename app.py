@@ -58,7 +58,6 @@ server = app.server
 
 # Layout of the app
 app.layout = html.Div(style={'backgroundColor': '#f7f9fc', 'padding': '20px'}, children=[
-    # Botón "Volver al Inicio" en la parte superior
     html.Div([
         html.A("🏠 Volver al Inicio", href="https://stem-bolivia.onrender.com", style={
             "color": "#007bff", 
@@ -70,9 +69,6 @@ app.layout = html.Div(style={'backgroundColor': '#f7f9fc', 'padding': '20px'}, c
         })
     ], style={"text-align": "left"}),
 
-
-# Layout of the app
-app.layout = html.Div(style={'backgroundColor': '#f7f9fc', 'padding': '20px'}, children=[
     html.H1("¡Sean bienvenidos al Portal Mujeres STEM de Bolivia!", style={'text-align': 'center', 'color': '#333'}),
     html.P("En este espacio podrás encontrar a mujeres bolivianas que se desenvuelven profesionalmente y lideran en las áreas de ciencia, tecnología, ingeniería y matemáticas (STEM). Encontrarás información clave como su nombre, profesión, ocupación, logros destacados y algún medio de contacto. Nuestro objetivo es visibilizar su impacto y conectar a quienes buscan inspiración, colaboración o referentes en estos campos.", 
            style={'text-align': 'center', 'color': '#555', 'margin-bottom': '30px'}),
@@ -125,6 +121,7 @@ app.layout = html.Div(style={'backgroundColor': '#f7f9fc', 'padding': '20px'}, c
         ]
     )
 ])
+
 
 # Callback to update the map with filters
 @app.callback(
