@@ -43,8 +43,6 @@ city_coordinates = {
     'La Paz': {"lat": -16.5000, "lon": -68.1500, "zoom": 12},
     'Cochabamba': {"lat": -17.3895, "lon": -66.1568, "zoom": 12},
     'Santa Cruz': {"lat": -17.7833, "lon": -63.1823, "zoom": 12},
-    'Tarija': {"lat": -21.5333, "lon": -64.7333, "zoom": 12},
-    'Sucre': {"lat": -19.0333, "lon": -65.2627, "zoom": 12},
     'Todos': {"lat": -17.0, "lon": -65.0, "zoom": 5}
 }
 
@@ -55,10 +53,22 @@ server = app.server
 
 # Layout of the app
 app.layout = html.Div(style={'backgroundColor': '#f7f9fc', 'padding': '20px'}, children=[
+    # Botón "Volver al Inicio" en la parte superior
+    html.Div([
+        dbc.Button(
+            html.Span("🏠 Volver al Inicio", style={"margin-left": "5px"}),
+            href="https://stem-bolivia.onrender.com",  # URL de la página principal (app2.py)
+            color="primary",
+            className="mt-2"
+        )
+    ], style={"text-align": "left", "margin-bottom": "20px"}),
+
+    # Encabezado principal
     html.H1("¡Sean bienvenidos al Portal Mujeres STEM de Bolivia!", style={'text-align': 'center', 'color': '#333'}),
     html.P("Este espacio podrás encontrar a mujeres bolivianas que se desenvuelven profesionalmente y lideran en las áreas de ciencia, tecnología, ingeniería y matemáticas (STEM).", 
            style={'text-align': 'center', 'color': '#555', 'margin-bottom': '30px'}),
 
+    # Filtros
     html.Div([
         html.Label('Filtrar por Campo STEM:', style={'font-weight': 'bold', 'color': '#333'}),
         dcc.Dropdown(
@@ -70,16 +80,19 @@ app.layout = html.Div(style={'backgroundColor': '#f7f9fc', 'padding': '20px'}, c
 
     dcc.Graph(id='mapa_interactivo', style={'height': '700px'}),
 
-    # Botón para volver al inicio
+    # Formulario y llamado a la acción
     html.Div([
-        dbc.Button(
-            html.Span("🏠 Volver al Inicio", style={"margin-left": "5px"}),
-            href="https://stem-bolivia.onrender.com",  # URL de la página principal (app2.py)
-            color="light",
-            className="mt-3"
-        )
-    ], style={"text-align": "center", "margin-top": "20px"}),
+        html.P("¿Eres y/o conoces a una mujer boliviana trabajando en áreas STEM? Te invitamos a completar este breve formulario para ser incluida en nuestro portal si así lo deseas. ¡Construyamos juntas una red que inspire y fortalezca la presencia femenina en STEM!",
+               style={'text-align': 'center', 'margin-top': '30px'}),
+        html.Div([
+            html.A("Completa el formulario aquí", 
+                   href="https://docs.google.com/forms/d/e/1FAIpQLSfwBN3aT7V-P-qWVlNRC5VXuay5sBZTE2tCq7OUhFO7rnzXKw/viewform?usp=sf_link", 
+                   target="_blank", 
+                   style={'text-align': 'center', 'display': 'block', 'margin-top': '10px', 'color': '#007bff', 'font-weight': 'bold'})
+        ], style={"text-align": "center"})
+    ]),
 
+    # Nota informativa al final
     html.Div(
         children=[
             html.P(
@@ -130,4 +143,3 @@ def update_map(filtro_stem):
 
 if __name__ == '__main__':
     app.run_server(debug=True, port=9090)
-
