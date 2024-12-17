@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from dash import dcc, html
 from dash.dependencies import Input, Output, State
+import dash_bootstrap_components as dbc  # Importar dbc
 import numpy as np
 import os
 
@@ -44,27 +45,20 @@ city_coordinates = {
     'Santa Cruz': {"lat": -17.7833, "lon": -63.1823, "zoom": 12},
     'Tarija': {"lat": -21.5333, "lon": -64.7333, "zoom": 12},
     'Sucre': {"lat": -19.0333, "lon": -65.2627, "zoom": 12},
-    'Oruro': {"lat": -17.9667, "lon": -67.1064, "zoom": 12},
-    'Potosi': {"lat": -19.5833, "lon": -65.7500, "zoom": 12},
-    'Beni': {"lat": -14.8333, "lon": -64.9000, "zoom": 12},
-    'Pando': {"lat": -11.0264, "lon": -68.7692, "zoom": 12},
     'Todos': {"lat": -17.0, "lon": -65.0, "zoom": 5}
 }
 
-# Initialize Dash app
-app = dash.Dash(__name__)
+# Initialize Dash app with Bootstrap
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "Mujeres STEM Bolivia"
 server = app.server
 
 # Layout of the app
 app.layout = html.Div(style={'backgroundColor': '#f7f9fc', 'padding': '20px'}, children=[
     html.H1("¡Sean bienvenidos al Portal Mujeres STEM de Bolivia!", style={'text-align': 'center', 'color': '#333'}),
-    html.P("En este espacio podrás encontrar a mujeres bolivianas que se desenvuelven profesionalmente y lideran en las áreas de ciencia, tecnología, ingeniería y matemáticas (STEM). Encontrarás información clave como su nombre, profesión, ocupación, logros destacados y algún medio de contacto. Nuestro objetivo es visibilizar su impacto y conectar a quienes buscan inspiración, colaboración o referentes en estos campos.", 
+    html.P("Este espacio podrás encontrar a mujeres bolivianas que se desenvuelven profesionalmente y lideran en las áreas de ciencia, tecnología, ingeniería y matemáticas (STEM).", 
            style={'text-align': 'center', 'color': '#555', 'margin-bottom': '30px'}),
-    
-    html.H1("", style={'text-align': 'center', 'color': '#333'}),
-    html.P("Una visualización de mujeres destacadas en el campo STEM en Bolivia", style={'text-align': 'center', 'color': '#555'}),
-    
+
     html.Div([
         html.Label('Filtrar por Campo STEM:', style={'font-weight': 'bold', 'color': '#333'}),
         dcc.Dropdown(
@@ -73,24 +67,19 @@ app.layout = html.Div(style={'backgroundColor': '#f7f9fc', 'padding': '20px'}, c
             value='Todos los campos'
         )
     ], style={'text-align': 'center', 'margin-bottom': '20px'}),
-    
-    html.Div([
-        html.Label('Seleccionar ciudad:', style={'font-weight': 'bold', 'color': '#333'}),
-        dcc.Dropdown(
-            id='filtro_ciudad',
-            options=[{'label': "Ver toda Bolivia", 'value': 'Todos'}] + [{'label': ciudad, 'value': ciudad} for ciudad in city_coordinates.keys() if ciudad != 'Todos'],
-            value='Todos'
-        )
-    ], style={'text-align': 'center', 'margin-bottom': '20px'}),
-    
+
     dcc.Graph(id='mapa_interactivo', style={'height': '700px'}),
 
-    html.P("¿Eres y/o conoces a una mujer boliviana trabajando en áreas STEM? Te invitamos a completar este breve formulario para ser incluida en nuestro portal si así lo deseas. Construiremos una red que inspire a más mujeres y fortalezca la presencia femenina en STEM.", 
-           style={'text-align': 'center', 'margin-top': '30px'}),
-    html.A("Completa el formulario aquí", href="https://docs.google.com/forms/d/e/1FAIpQLSfwBN3aT7V-P-qWVlNRC5VXuay5sBZTE2tCq7OUhFO7rnzXKw/viewform?usp=sf_link", target="_blank", style={'text-align': 'center', 'display': 'block', 'margin-top': '10px'}),
-    html.P("¡Deja tu huella y únete al Portal Mujeres STEM Bolivia!", style={'text-align': 'center', 'margin-top': '10px', 'color': '#555'}),
+    # Botón para volver al inicio
+    html.Div([
+        dbc.Button(
+            html.Span("🏠 Volver al Inicio", style={"margin-left": "5px"}),
+            href="https://stem-bolivia.onrender.com",  # URL de la página principal (app2.py)
+            color="light",
+            className="mt-3"
+        )
+    ], style={"text-align": "center", "margin-top": "20px"}),
 
-    # Nota informativa sobre la versión beta
     html.Div(
         children=[
             html.P(
@@ -110,69 +99,35 @@ app.layout = html.Div(style={'backgroundColor': '#f7f9fc', 'padding': '20px'}, c
         ]
     )
 ])
-html.Div([
-    dbc.Button(
-        html.Span("🏠 Volver al Inicio", style={"margin-left": "5px"}),
-        href="https://stem-bolivia.onrender.com",  # URL de la página central
-        color="light",
-        className="mt-3"
-    )
-], style={"text-align": "center", "margin-top": "20px"})
 
 # Callback to update the map with filters
 @app.callback(
     Output('mapa_interactivo', 'figure'),
-    [Input('filtro_stem', 'value'),
-     Input('filtro_ciudad', 'value')]
+    [Input('filtro_stem', 'value')]
 )
-def update_map(filtro_stem, filtro_ciudad):
+def update_map(filtro_stem):
     dff = df_bolivia_30_women.copy()
     if filtro_stem != 'Todos los campos':
         dff = dff[dff['Campo STEM'] == filtro_stem]
-    
-    coord = city_coordinates.get(filtro_ciudad, city_coordinates['Todos'])
 
-    dff = ajustar_lat_long(dff, coord['zoom'])
+    dff = ajustar_lat_long(dff, zoom=5)
 
     fig = go.Figure(go.Scattermapbox(
         lat=dff['Latitud'],
         lon=dff['Longitud'],
         mode='markers',
-        marker=dict(
-            size=18,
-            color=dff['Color'],
-            opacity=0.85
-        ),
+        marker=dict(size=18, color=dff['Color'], opacity=0.85),
         text=dff['Nombre'],
-        hoverinfo='text',
-        hovertext=dff.apply(lambda row: f"<b>{row['Nombre']}</b><br>{row['Campo STEM']}<br><i>Institución:</i> {row['Institución']}<br><i>Logros:</i> {row['Destacado']}", axis=1),
-        customdata=dff['Contacto (página personal, otros)']
+        hoverinfo='text'
     ))
 
     fig.update_layout(
-        mapbox=dict(
-            style="carto-positron",
-            zoom=coord['zoom'],
-            center={"lat": coord['lat'], "lon": coord['lon']}
-        ),
+        mapbox=dict(style="carto-positron", zoom=5, center={"lat": -17.0, "lon": -65.0}),
         margin={"r": 0, "t": 0, "l": 0, "b": 0}
     )
 
     return fig
 
-# Callback to open external links when clicking on a map point
-app.clientside_callback(
-    """
-    function(clickData) {
-        if (clickData) {
-            const url = clickData.points[0].customdata;
-            window.open(url, '_blank');
-        }
-    }
-    """,
-    Output('mapa_interactivo', 'clickData'),
-    Input('mapa_interactivo', 'clickData')
-)
-
 if __name__ == '__main__':
     app.run_server(debug=True, port=9090)
+
