@@ -110,6 +110,14 @@ app.layout = html.Div(style={'backgroundColor': '#f7f9fc', 'padding': '20px'}, c
         ]
     )
 ])
+html.Div([
+    dbc.Button(
+        html.Span("🏠 Volver al Inicio", style={"margin-left": "5px"}),
+        href="https://stem-bolivia.onrender.com",  # URL de la página central
+        color="light",
+        className="mt-3"
+    )
+], style={"text-align": "center", "margin-top": "20px"})
 
 # Callback to update the map with filters
 @app.callback(
